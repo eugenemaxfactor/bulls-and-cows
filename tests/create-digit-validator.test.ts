@@ -11,6 +11,14 @@ describe('createDigitValidator', () => {
     expect(isBinaryDigit('2')).toBe(false);
   });
 
+  it('accepts octal digits from zero to seven', () => {
+    const isOctalDigit = createDigitValidator(8);
+
+    expect(isOctalDigit('0')).toBe(true);
+    expect(isOctalDigit('7')).toBe(true);
+    expect(isOctalDigit('8')).toBe(false);
+  });
+
   it('accepts decimal digits from zero to nine', () => {
     const isDecimalDigit = createDigitValidator(10);
 
