@@ -4,7 +4,23 @@ export interface GuessResult {
 }
 
 export function evaluateGuess(secret: string, guess: string): GuessResult {
-  throw new Error(
-    `evaluateGuess is not implemented for ${secret} and ${guess}`,
-  );
+  const normalizedSecret = secret.toLowerCase();
+  const normalizedGuess = guess.toLowerCase();
+  const secretDigits = normalizedSecret.split('');
+
+  function isBull(digit: string, index: number): boolean {
+    return digit === normalizedGuess[index];
+  }
+
+  function isCow(digit: string, index: number): boolean {
+    const isInGuess = normalizedGuess.includes(digit);
+    const isInDifferentPosition = digit !== normalizedGuess[index];
+
+    return isInGuess && isInDifferentPosition;
+  }
+
+  const bulls = secretDigits.filter(isBull).length;
+  const cows = secretDigits.filter(isCow).length;
+
+  return { bulls, cows };
 }
