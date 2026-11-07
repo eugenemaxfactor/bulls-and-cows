@@ -1,3 +1,30 @@
+import { generateSecret } from './game/generate-secret.js';
+
+let secret = '';
+
+function handleSettingsSubmit(event: SubmitEvent): void {
+  event.preventDefault();
+
+  const selectedBase = Number(baseSelect.value);
+  const selectedLength = Number(lengthSelect.value);
+
+  secret = generateSecret(selectedLength, selectedBase);
+  settingsSummary.textContent = `A ${secret.length}-digit secret is ready.`;
+}
+
+function updateLengthOptions(): void {
+  const isBinary = baseSelect.value === '2';
+
+  threeDigitsOption.disabled = isBinary;
+  fourDigitsOption.disabled = isBinary;
+  fiveDigitsOption.disabled = isBinary;
+  sixDigitsOption.disabled = isBinary;
+
+  if (isBinary) {
+    lengthSelect.value = '2';
+  }
+}
+
 const main = document.createElement('main');
 
 const title = document.createElement('h1');
@@ -10,6 +37,7 @@ const settingsTitle = document.createElement('h2');
 settingsTitle.textContent = 'Game settings';
 
 const settingsForm = document.createElement('form');
+settingsForm.addEventListener('submit', handleSettingsSubmit);
 
 const baseLabel = document.createElement('label');
 baseLabel.htmlFor = 'base';
@@ -72,6 +100,22 @@ lengthSelect.append(
   fiveDigitsOption,
   sixDigitsOption,
 );
-settingsForm.append(baseLabel, baseSelect, lengthLabel, lengthSelect);
-main.append(title, description, settingsTitle, settingsForm);
+
+baseSelect.addEventListener('change', updateLengthOptions);
+updateLengthOptions();
+
+const startButton = document.createElement('button');
+startButton.type = 'submit';
+startButton.textContent = 'Start game';
+
+const settingsSummary = document.createElement('p');
+
+settingsForm.append(
+  baseLabel,
+  baseSelect,
+  lengthLabel,
+  lengthSelect,
+  startButton,
+);
+main.append(title, description, settingsTitle, settingsForm, settingsSummary);
 document.body.append(main);
