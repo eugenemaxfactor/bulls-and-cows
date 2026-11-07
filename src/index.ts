@@ -36,6 +36,42 @@ hexadecimalOption.value = '16';
 hexadecimalOption.textContent = 'Hexadecimal';
 
 baseSelect.append(binaryOption, octalOption, decimalOption, hexadecimalOption);
-settingsForm.append(baseLabel, baseSelect);
+
+const lengthLabel = document.createElement('label');
+lengthLabel.htmlFor = 'length';
+lengthLabel.textContent = 'Secret length';
+
+const lengthSelect = document.createElement('select');
+lengthSelect.id = 'length';
+lengthSelect.name = 'length';
+
+const twoDigitsOption = document.createElement('option');
+twoDigitsOption.value = '2';
+twoDigitsOption.textContent = '2 digits';
+
+const threeDigitsOption = document.createElement('option');
+threeDigitsOption.value = '3';
+threeDigitsOption.textContent = '3 digits';
+
+const fourDigitsOption = document.createElement('option');
+fourDigitsOption.value = '4';
+fourDigitsOption.textContent = '4 digits';
+
+const fiveDigitsOption = document.createElement('option');
+fiveDigitsOption.value = '5';
+fiveDigitsOption.textContent = '5 digits';
+
+const sixDigitsOption = document.createElement('option');
+sixDigitsOption.value = '6';
+sixDigitsOption.textContent = '6 digits';
+
+lengthSelect.append(
+  twoDigitsOption,
+  threeDigitsOption,
+  fourDigitsOption,
+  fiveDigitsOption,
+  sixDigitsOption,
+);
+settingsForm.append(baseLabel, baseSelect, lengthLabel, lengthSelect);
 main.append(title, description, settingsTitle, settingsForm);
 document.body.append(main);
