@@ -9,7 +9,14 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   const selectedLength = Number(lengthSelect.value);
 
   secret = generateSecret(selectedLength, selectedBase);
+  baseSelect.disabled = true;
+  lengthSelect.disabled = true;
+  startButton.disabled = true;
   settingsSummary.textContent = `A ${secret.length}-digit secret is ready.`;
+  guessInput.maxLength = selectedLength;
+  guessTitle.hidden = false;
+  guessLabel.hidden = false;
+  guessInput.hidden = false;
 }
 
 function updateLengthOptions(): void {
@@ -110,6 +117,22 @@ startButton.textContent = 'Start game';
 
 const settingsSummary = document.createElement('p');
 
+const guessTitle = document.createElement('h2');
+guessTitle.textContent = 'Your guess';
+guessTitle.hidden = true;
+
+const guessLabel = document.createElement('label');
+guessLabel.htmlFor = 'guess';
+guessLabel.textContent = 'Your guess';
+guessLabel.hidden = true;
+
+const guessInput = document.createElement('input');
+guessInput.id = 'guess';
+guessInput.name = 'guess';
+guessInput.type = 'text';
+guessInput.autocomplete = 'off';
+guessInput.hidden = true;
+
 settingsForm.append(
   baseLabel,
   baseSelect,
@@ -117,5 +140,14 @@ settingsForm.append(
   lengthSelect,
   startButton,
 );
-main.append(title, description, settingsTitle, settingsForm, settingsSummary);
+main.append(
+  title,
+  description,
+  settingsTitle,
+  settingsForm,
+  settingsSummary,
+  guessTitle,
+  guessLabel,
+  guessInput,
+);
 document.body.append(main);
