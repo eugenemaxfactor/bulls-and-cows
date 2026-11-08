@@ -1,4 +1,7 @@
+import { createDigitValidator } from './game/create-digit-validator.js';
+import { evaluateGuess } from './game/evaluate-guess.js';
 import { generateSecret } from './game/generate-secret.js';
+import { isValidGuess } from './game/is-valid-guess.js';
 
 let secret = '';
 
@@ -17,6 +20,7 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   guessTitle.hidden = false;
   guessLabel.hidden = false;
   guessInput.hidden = false;
+  checkButton.hidden = false;
 }
 
 function updateLengthOptions(): void {
@@ -30,6 +34,57 @@ function updateLengthOptions(): void {
   if (isBinary) {
     lengthSelect.value = '2';
   }
+}
+
+function handleGuessInput(): void {
+  const selectedBase = Number(baseSelect.value);
+  const isValidDigit = createDigitValidator(selectedBase);
+  const guessCharacters = guessInput.value.split('');
+  const validCharacters = guessCharacters.filter(isValidDigit);
+
+  guessInput.value = validCharacters.join('');
+}
+
+function handleCheckButtonClick(): void {
+  const selectedBase = Number(baseSelect.value);
+  const selectedLength = Number(lengthSelect.value);
+  const guessIsValid = isValidGuess(
+    guessInput.value,
+    selectedLength,
+    selectedBase,
+  );
+
+  if (guessIsValid) {
+    const guessResult = evaluateGuess(secret, guessInput.value);
+
+    if (guessResult.bulls === secret.length) {
+      guessMessage.textContent = 'You guessed the secret number!';
+      guessInput.disabled = true;
+      checkButton.disabled = true;
+      newGameButton.hidden = false;
+    } else {
+      guessMessage.textContent = `Bulls: ${guessResult.bulls}, cows: ${guessResult.cows}.`;
+    }
+  } else {
+    guessMessage.textContent = 'Enter the correct number of unique digits.';
+  }
+}
+
+function handleNewGameButtonClick(): void {
+  secret = '';
+  baseSelect.disabled = false;
+  lengthSelect.disabled = false;
+  startButton.disabled = false;
+  settingsSummary.textContent = '';
+  guessInput.value = '';
+  guessInput.disabled = false;
+  guessTitle.hidden = true;
+  guessLabel.hidden = true;
+  guessInput.hidden = true;
+  checkButton.disabled = false;
+  checkButton.hidden = true;
+  guessMessage.textContent = '';
+  newGameButton.hidden = true;
 }
 
 const main = document.createElement('main');
@@ -132,6 +187,21 @@ guessInput.name = 'guess';
 guessInput.type = 'text';
 guessInput.autocomplete = 'off';
 guessInput.hidden = true;
+guessInput.addEventListener('input', handleGuessInput);
+
+const checkButton = document.createElement('button');
+checkButton.type = 'button';
+checkButton.textContent = 'Check guess';
+checkButton.hidden = true;
+checkButton.addEventListener('click', handleCheckButtonClick);
+
+const guessMessage = document.createElement('p');
+
+const newGameButton = document.createElement('button');
+newGameButton.type = 'button';
+newGameButton.textContent = 'New game';
+newGameButton.hidden = true;
+newGameButton.addEventListener('click', handleNewGameButtonClick);
 
 settingsForm.append(
   baseLabel,
@@ -149,5 +219,8 @@ main.append(
   guessTitle,
   guessLabel,
   guessInput,
+  checkButton,
+  guessMessage,
+  newGameButton,
 );
 document.body.append(main);
