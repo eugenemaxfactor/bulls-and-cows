@@ -1,3 +1,4 @@
+import { countPossibleSecrets } from './game/count-possible-secrets.js';
 import { createDigitValidator } from './game/create-digit-validator.js';
 import { evaluateGuess } from './game/evaluate-guess.js';
 import { generateSecret } from './game/generate-secret.js';
@@ -61,6 +62,14 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   historyList.hidden = false;
 }
 
+function updatePossibleSecrets(): void {
+  const selectedBase = Number(baseSelect.value);
+  const selectedLength = Number(lengthSelect.value);
+  const possibleSecrets = countPossibleSecrets(selectedLength, selectedBase);
+
+  possibleSecretsMessage.textContent = `Possible secrets: ${possibleSecrets}`;
+}
+
 function updateLengthOptions(): void {
   const isBinary = baseSelect.value === '2';
 
@@ -72,6 +81,8 @@ function updateLengthOptions(): void {
   if (isBinary) {
     lengthSelect.value = '2';
   }
+
+  updatePossibleSecrets();
 }
 
 function handleGuessInput(): void {
@@ -264,13 +275,16 @@ lengthSelect.append(
 );
 
 baseSelect.addEventListener('change', updateLengthOptions);
-updateLengthOptions();
+lengthSelect.addEventListener('change', updatePossibleSecrets);
 
 const startButton = document.createElement('button');
 startButton.type = 'submit';
 startButton.textContent = 'Start game';
 
 const settingsSummary = document.createElement('p');
+
+const possibleSecretsMessage = document.createElement('p');
+updateLengthOptions();
 
 const guessTitle = document.createElement('h2');
 guessTitle.textContent = 'Your guess';
@@ -327,6 +341,7 @@ main.append(
   description,
   settingsTitle,
   settingsForm,
+  possibleSecretsMessage,
   settingsSummary,
   guessTitle,
   guessLabel,
