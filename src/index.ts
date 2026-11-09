@@ -54,7 +54,6 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   startButton.disabled = true;
   settingsSummary.textContent = `A ${secret.length}-digit secret is ready.`;
   guessInput.maxLength = selectedLength;
-  guessTitle.hidden = false;
   guessLabel.hidden = false;
   guessInput.hidden = false;
   checkButton.hidden = false;
@@ -211,7 +210,6 @@ function handleNewGameButtonClick(): void {
   settingsSummary.textContent = '';
   guessInput.value = '';
   guessInput.disabled = false;
-  guessTitle.hidden = true;
   guessLabel.hidden = true;
   guessInput.hidden = true;
   checkButton.disabled = false;
@@ -286,10 +284,6 @@ const settingsSummary = document.createElement('p');
 const possibleSecretsMessage = document.createElement('p');
 updateLengthOptions();
 
-const guessTitle = document.createElement('h2');
-guessTitle.textContent = 'Your guess';
-guessTitle.hidden = true;
-
 const guessLabel = document.createElement('label');
 guessLabel.htmlFor = 'guess';
 guessLabel.textContent = 'Your guess';
@@ -343,7 +337,6 @@ main.append(
   settingsForm,
   possibleSecretsMessage,
   settingsSummary,
-  guessTitle,
   guessLabel,
   guessInput,
   checkButton,
