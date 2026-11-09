@@ -3,7 +3,34 @@ import { evaluateGuess } from './game/evaluate-guess.js';
 import { generateSecret } from './game/generate-secret.js';
 import { isValidGuess } from './game/is-valid-guess.js';
 
+interface GuessHistoryEntry {
+  guess: string;
+  bulls: number;
+  cows: number;
+}
+
+interface GameRecord {
+  attempts: number;
+  durationInSeconds: number;
+  length: number;
+  base: number;
+}
+
+const recordsStorageKey = 'bulls-and-cows-records';
+const recordsLimit = 10;
+
 let secret = '';
+let guessHistory: GuessHistoryEntry[] = [];
+let roundStartedAt = 0;
+let gameRecords: GameRecord[] = [];
+
+const savedRecords = localStorage.getItem(recordsStorageKey);
+
+if (savedRecords) {
+  gameRecords = (JSON.parse(savedRecords) as GameRecord[])
+    .sort(compareGameRecords)
+    .slice(0, recordsLimit);
+}
 
 function handleSettingsSubmit(event: SubmitEvent): void {
   event.preventDefault();
@@ -12,6 +39,7 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   const selectedLength = Number(lengthSelect.value);
 
   secret = generateSecret(selectedLength, selectedBase);
+  roundStartedAt = Date.now();
   baseSelect.disabled = true;
   lengthSelect.disabled = true;
   startButton.disabled = true;
@@ -21,6 +49,8 @@ function handleSettingsSubmit(event: SubmitEvent): void {
   guessLabel.hidden = false;
   guessInput.hidden = false;
   checkButton.hidden = false;
+  historyTitle.hidden = false;
+  historyList.hidden = false;
 }
 
 function updateLengthOptions(): void {
@@ -45,6 +75,56 @@ function handleGuessInput(): void {
   guessInput.value = validCharacters.join('');
 }
 
+function createHistoryListItem(entry: GuessHistoryEntry): HTMLLIElement {
+  const historyItem = document.createElement('li');
+  historyItem.textContent = `${entry.guess}: ${entry.bulls} bulls, ${entry.cows} cows`;
+
+  return historyItem;
+}
+
+function renderGuessHistory(): void {
+  const historyItems = guessHistory.map(createHistoryListItem);
+
+  historyList.replaceChildren(...historyItems);
+}
+
+function compareGameRecords(
+  firstRecord: GameRecord,
+  secondRecord: GameRecord,
+): number {
+  if (firstRecord.attempts !== secondRecord.attempts) {
+    return firstRecord.attempts - secondRecord.attempts;
+  }
+
+  return firstRecord.durationInSeconds - secondRecord.durationInSeconds;
+}
+
+function createGameRecordListItem(record: GameRecord): HTMLLIElement {
+  const recordItem = document.createElement('li');
+  recordItem.textContent = `${record.length} digits, base ${record.base}: ${record.attempts} attempts, ${record.durationInSeconds} seconds`;
+
+  return recordItem;
+}
+
+function renderGameRecords(): void {
+  const recordItems = gameRecords.map(createGameRecordListItem);
+
+  recordsList.replaceChildren(...recordItems);
+}
+
+function hasGuessBeenUsed(
+  history: GuessHistoryEntry[],
+  guess: string,
+): boolean {
+  const normalizedGuess = guess.toLowerCase();
+
+  function isSameGuess(entry: GuessHistoryEntry): boolean {
+    return entry.guess === normalizedGuess;
+  }
+
+  return history.some(isSameGuess);
+}
+
 function handleCheckButtonClick(): void {
   const selectedBase = Number(baseSelect.value);
   const selectedLength = Number(lengthSelect.value);
@@ -55,10 +135,42 @@ function handleCheckButtonClick(): void {
   );
 
   if (guessIsValid) {
+    const guessWasUsed = hasGuessBeenUsed(guessHistory, guessInput.value);
+
+    if (guessWasUsed) {
+      guessMessage.textContent = 'This guess has already been used.';
+      return;
+    }
+
     const guessResult = evaluateGuess(secret, guessInput.value);
+    const historyEntry: GuessHistoryEntry = {
+      guess: guessInput.value.toLowerCase(),
+      bulls: guessResult.bulls,
+      cows: guessResult.cows,
+    };
+
+    guessHistory = [...guessHistory, historyEntry];
+    renderGuessHistory();
 
     if (guessResult.bulls === secret.length) {
-      guessMessage.textContent = 'You guessed the secret number!';
+      const roundFinishedAt = Date.now();
+      const roundDurationInSeconds = Math.floor(
+        (roundFinishedAt - roundStartedAt) / 1000,
+      );
+      const gameRecord: GameRecord = {
+        attempts: guessHistory.length,
+        durationInSeconds: roundDurationInSeconds,
+        length: selectedLength,
+        base: selectedBase,
+      };
+
+      gameRecords = [...gameRecords, gameRecord]
+        .sort(compareGameRecords)
+        .slice(0, recordsLimit);
+      localStorage.setItem(recordsStorageKey, JSON.stringify(gameRecords));
+      renderGameRecords();
+
+      guessMessage.textContent = `You guessed the secret number in ${guessHistory.length} attempts and ${roundDurationInSeconds} seconds!`;
       guessInput.disabled = true;
       checkButton.disabled = true;
       newGameButton.hidden = false;
@@ -72,6 +184,8 @@ function handleCheckButtonClick(): void {
 
 function handleNewGameButtonClick(): void {
   secret = '';
+  guessHistory = [];
+  roundStartedAt = 0;
   baseSelect.disabled = false;
   lengthSelect.disabled = false;
   startButton.disabled = false;
@@ -84,6 +198,9 @@ function handleNewGameButtonClick(): void {
   checkButton.disabled = false;
   checkButton.hidden = true;
   guessMessage.textContent = '';
+  historyTitle.hidden = true;
+  historyList.hidden = true;
+  historyList.replaceChildren();
   newGameButton.hidden = true;
 }
 
@@ -197,6 +314,18 @@ checkButton.addEventListener('click', handleCheckButtonClick);
 
 const guessMessage = document.createElement('p');
 
+const historyTitle = document.createElement('h2');
+historyTitle.textContent = 'Guess history';
+historyTitle.hidden = true;
+
+const historyList = document.createElement('ul');
+historyList.hidden = true;
+
+const recordsTitle = document.createElement('h2');
+recordsTitle.textContent = 'Best results';
+
+const recordsList = document.createElement('ol');
+
 const newGameButton = document.createElement('button');
 newGameButton.type = 'button';
 newGameButton.textContent = 'New game';
@@ -221,6 +350,11 @@ main.append(
   guessInput,
   checkButton,
   guessMessage,
+  historyTitle,
+  historyList,
   newGameButton,
+  recordsTitle,
+  recordsList,
 );
 document.body.append(main);
+renderGameRecords();
