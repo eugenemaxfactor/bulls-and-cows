@@ -1,0 +1,160 @@
+:root {
+  --color-background: #17191d;
+  --color-surface: #23262c;
+  --color-text: #f3f4f6;
+  --color-heading: #ffffff;
+  --color-muted: #b8bec9;
+  --color-border: #454b55;
+  --color-border-hover: #8aa7d8;
+  --color-accent: #5b83c7;
+  --focus-shadow: 0 0 0 3px rgb(155 188 242 / 20%);
+  --space-small: 0.5rem;
+  --space-medium: 0.75rem;
+  --space-large: 1rem;
+  --space-section: 1.5rem;
+  --space-page: 3rem;
+  --content-width: 42rem;
+  --control-height: 2.75rem;
+  --control-radius: 0.375rem;
+  --title-size: 2rem;
+  --section-title-size: 1.25rem;
+
+  color-scheme: dark;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--color-background);
+}
+
+main {
+  display: grid;
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  padding: var(--space-page) var(--space-section);
+  gap: var(--space-large);
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: var(--color-heading);
+}
+
+h1 {
+  font-size: var(--title-size);
+}
+
+h2 {
+  margin-top: var(--space-section);
+  font-size: var(--section-title-size);
+}
+
+p,
+li {
+  line-height: 1.5;
+}
+
+p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+form {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: var(--space-medium) var(--space-large);
+  align-items: center;
+}
+
+label {
+  font-weight: 600;
+}
+
+select,
+input,
+button {
+  min-height: var(--control-height);
+  border: 1px solid var(--color-border);
+  border-radius: var(--control-radius);
+  font: inherit;
+}
+
+select,
+input {
+  width: 100%;
+  padding: 0.625rem var(--space-medium);
+  background-color: var(--color-surface);
+  color: var(--color-heading);
+}
+
+button {
+  padding: 0.625rem var(--space-large);
+  background-color: var(--color-accent);
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+form button {
+  grid-column: 1 / -1;
+}
+
+main > button {
+  justify-self: start;
+}
+
+button:hover:not(:disabled),
+select:hover:not(:disabled),
+input:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+}
+
+button:disabled,
+select:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-shadow);
+}
+
+ul,
+ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+li + li {
+  margin-top: var(--space-small);
+}
+
+@media (max-width: 30rem) {
+  main {
+    padding: 2rem var(--space-large);
+  }
+
+  form {
+    grid-template-columns: 1fr;
+  }
+
+  form button {
+    grid-column: auto;
+  }
+
+  button {
+    width: 100%;
+  }
+}
