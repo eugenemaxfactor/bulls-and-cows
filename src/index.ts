@@ -32,6 +32,14 @@ if (savedRecords) {
     .slice(0, recordsLimit);
 }
 
+function createOption(value: string, text: string): HTMLOptionElement {
+  const option = document.createElement('option');
+  option.value = value;
+  option.textContent = text;
+
+  return option;
+}
+
 function handleSettingsSubmit(event: SubmitEvent): void {
   event.preventDefault();
 
@@ -226,21 +234,10 @@ const baseSelect = document.createElement('select');
 baseSelect.id = 'base';
 baseSelect.name = 'base';
 
-const binaryOption = document.createElement('option');
-binaryOption.value = '2';
-binaryOption.textContent = 'Binary';
-
-const octalOption = document.createElement('option');
-octalOption.value = '8';
-octalOption.textContent = 'Octal';
-
-const decimalOption = document.createElement('option');
-decimalOption.value = '10';
-decimalOption.textContent = 'Decimal';
-
-const hexadecimalOption = document.createElement('option');
-hexadecimalOption.value = '16';
-hexadecimalOption.textContent = 'Hexadecimal';
+const binaryOption = createOption('2', 'Binary');
+const octalOption = createOption('8', 'Octal');
+const decimalOption = createOption('10', 'Decimal');
+const hexadecimalOption = createOption('16', 'Hexadecimal');
 
 baseSelect.append(binaryOption, octalOption, decimalOption, hexadecimalOption);
 
@@ -252,25 +249,11 @@ const lengthSelect = document.createElement('select');
 lengthSelect.id = 'length';
 lengthSelect.name = 'length';
 
-const twoDigitsOption = document.createElement('option');
-twoDigitsOption.value = '2';
-twoDigitsOption.textContent = '2 digits';
-
-const threeDigitsOption = document.createElement('option');
-threeDigitsOption.value = '3';
-threeDigitsOption.textContent = '3 digits';
-
-const fourDigitsOption = document.createElement('option');
-fourDigitsOption.value = '4';
-fourDigitsOption.textContent = '4 digits';
-
-const fiveDigitsOption = document.createElement('option');
-fiveDigitsOption.value = '5';
-fiveDigitsOption.textContent = '5 digits';
-
-const sixDigitsOption = document.createElement('option');
-sixDigitsOption.value = '6';
-sixDigitsOption.textContent = '6 digits';
+const twoDigitsOption = createOption('2', '2 digits');
+const threeDigitsOption = createOption('3', '3 digits');
+const fourDigitsOption = createOption('4', '4 digits');
+const fiveDigitsOption = createOption('5', '5 digits');
+const sixDigitsOption = createOption('6', '6 digits');
 
 lengthSelect.append(
   twoDigitsOption,
